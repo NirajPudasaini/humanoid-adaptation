@@ -34,10 +34,12 @@ One of: an argument, a baseline, a method, a framing. Say which.
 
 ## Where it fails / what it does not cover
 
-## Relation to FAME
+## Assumptions worth interrogating
 
-Does this method assume the unknown is unobservable? Would it work if the quantity
-were measurable? What would it do on a fixed-stance task where stepping is disallowed?
+Does the method require the unknown to be unobservable, or would it still make sense
+if the quantity could be measured directly? What breaks if the timescale of change moves
+by an order of magnitude? And what does the task definition quietly permit the policy to
+do instead of adapting?
 
 ## Reviewer question it answers or raises
 

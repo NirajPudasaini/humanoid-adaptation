@@ -1,6 +1,6 @@
 # humanoid-adaptation
 
-Reading notes and research on **online adaptation for humanoid control**: context-conditioned
+Reading notes on **online adaptation for legged and humanoid control**: context-conditioned
 policies, latent adaptation, and in-context learning, with ideas drawn from locomotion,
 manipulation, and meta-RL.
 
@@ -12,57 +12,55 @@ Papers in this area get lumped together as "adaptation," which hides the only di
 that matters. Every method in this list is answering three questions, and it is the
 *combination* of answers that determines the architecture:
 
-1. **What is unknown?** Terrain friction, body mass, a locked joint, an exogenous hand force,
-   the whole morphology.
+1. **What is unknown?** Terrain friction, body mass, a locked joint, an external contact
+   force, the whole morphology.
 2. **How is the context obtained?** Handed to the policy directly, regressed from a privileged
    teacher, inferred implicitly from state-action history, or estimated from a dynamics model.
 3. **How fast does it change?** Fixed per episode, drifting over seconds, or switching at
    control rate.
 
-There is a fourth question that the field mostly leaves implicit, and it is the one this repo
+There is a fourth question the field mostly leaves implicit, and it is the one this repo
 cares most about:
 
 4. **Is the unknown actually unobservable, or is it recoverable from measurement?**
 
 Most of the adaptation literature assumes unobservable and builds machinery to infer. When the
-quantity *is* recoverable, that machinery is not obviously the right answer. Every note in this
-repo fills out those four axes before anything else.
+quantity *is* recoverable, that machinery is not obviously the right answer. Every note here
+fills out those four axes before anything else.
 
-## Two anchor papers
+## Two ways of doing it
 
-The list is framed around the gap between two papers that both "do online adaptation" and share
-almost nothing else.
+The clearest statement of the fork is two recent papers that both adapt online and share almost
+nothing else.
 
-| | LocoFormer | FAME |
+| | LocoFormer | Zhi et al. |
 |---|---|---|
-| What varies | Embodiment and dynamics parameters, mostly persistent within an episode | Exogenous hand loads, time-varying, can change at control rate |
-| How context is obtained | Implicit, from long state-action history | Explicit, model-based force estimate plus measured arm pose |
-| Architecture | Transformer-XL, long memory, cross-trial | MLP encoder, 3-step latent history |
+| What varies | Embodiment and dynamics parameters, mostly persistent within an episode | External contact wrench at the end effector, changing at contact-event rate |
+| How context is obtained | Implicitly, as attention over roughly 18 s of proprioceptive history | Explicitly, supervised regression from a 32-step proprioceptive window |
+| Architecture | Transformer-XL, long memory, carried across trials | Single-stage estimator trained alongside the policy |
 | Timescale | Seconds to multiple episodes | Essentially instantaneous |
-| Scope | Generalist, procedurally generated robots, zero-shot to unseen morphologies | Specialist, fixed-stance humanoid standing |
-| Objective | Velocity and goal tracking; stepping is a legitimate recovery | Keep feet and hands in place; stepping is a failure |
-| Is the unknown recoverable? | No. That is the premise. | Yes, from joint torques via RNEA and the arm Jacobian. |
+| Scope | Generalist, procedurally generated robots, zero-shot to unseen morphologies | Specialist, position and force control in loco-manipulation |
+| Is the unknown recoverable? | No, and that is the premise | Yes, from proprioception, and that is the premise |
 
-Strictly, FAME is **context-conditioned control with an estimated context**, not online adaptation
-in the RMA or LocoFormer sense. Keeping that distinction sharp is the point of the taxonomy below.
+Both get called adaptation. Only one of them is solving an inference problem. A method that
+conditions on a recoverable quantity is better described as context-conditioned control with an
+estimated context, and keeping that distinction sharp is the point of the taxonomy below.
 
 ## Start here
 
-Already read: [RMA](papers/02-teacher-student/kumar2021rma.md) (Kumar et al., RSS 2021). That is
-the anchor everything below is positioned against.
-
-Five papers, in this order. Together they cover every branch of the taxonomy and both anchor papers.
+Five papers, in this order. Together they cover every branch of the taxonomy and both sides of
+the fork above.
 
 1. **[Learning Quadrupedal Locomotion over Challenging Terrain](https://arxiv.org/abs/2010.11251)**
    · Lee et al., Science Robotics 5(47), 2020 · [notes](papers/02-teacher-student/lee2020challenging.md)
-   The origin of the teacher-student privileged-learning paradigm that RMA refined. Read it after
-   RMA to see where the two-stage idea came from and why the field adopted it wholesale.
+   The origin of the teacher-student privileged-learning paradigm that RMA later refined. Read it
+   alongside RMA to see where the two-stage idea came from and why the field adopted it wholesale.
 
 2. **[Hybrid Internal Model](https://arxiv.org/abs/2312.11460)**
    · Long et al., ICLR 2024 · [notes](papers/03-implicit-estimation/long2024him.md)
    The single-stage alternative to teacher-student: an implicit estimate of the environment learned
-   by contrastive prediction of the robot's own response, with no distillation phase. FAME's actor is
-   HIM-style, so this needs to be understood well enough to defend in a viva.
+   by contrastive prediction of the robot's own response, with no distillation phase. It has become
+   a common actor backbone in recent legged and humanoid work, so it is worth knowing in detail.
 
 3. **[RL²: Fast Reinforcement Learning via Slow Reinforcement Learning](https://arxiv.org/abs/1611.02779)**
    · Duan et al., arXiv 2016 · [notes](papers/01-meta-rl/duan2016rl2.md)
@@ -81,36 +79,36 @@ Five papers, in this order. Together they cover every branch of the taxonomy and
    produces emergent adaptation. Not a robotics paper, but it is the conceptual justification LocoFormer
    borrows, down to the figure design.
 
-### If the near-term goal is the force thread, not the framing
+### If the interest is contact forces specifically
 
-These four are closer to the actual research neighborhood than items 3 to 5 above, and two of them
-postdate the ICRA submission. Read them in parallel with the list above, not after it.
+Four papers in `05-explicit-conditioning` form their own thread, on estimating and controlling external
+contact forces rather than inferring hidden dynamics. They are recent, and three of the four postdate
+most of the list above. Worth reading in parallel rather than after.
 
 - **[Learning Force Control for Legged Manipulation](https://arxiv.org/abs/2405.01402)** · Portela et al., ICRA 2024.
-  The closest prior art to the core FAME claim: force conditioning on a legged platform with no F/T sensor.
-  It gets the force from a learned proprioceptive regressor rather than RNEA plus the arm Jacobian, which
-  is exactly the differentiator paragraph.
+  Force conditioning on a legged platform with no force-torque sensor, with the force estimate regressed
+  from proprioception.
 - **[Learning a Unified Policy for Position and Force Control in Legged Loco-Manipulation](https://arxiv.org/abs/2505.20829)**
   · Zhi et al., CoRL 2025 (Best Paper). Explicit supervised wrench regression from a 32-step proprioceptive
-  window, single stage. This is the paper a reviewer is most likely to hold FAME up against.
-- **[SixthSense: Task-Agnostic Proprioception-Only Whole-Body Wrench Estimation for Humanoids](https://arxiv.org/abs/2605.01427)**
-  · Chen et al., arXiv 2026. The strongest available evidence for FAME's premise that the external force
-  is recoverable rather than hidden, on humanoids, and it generalizes past the single-hand-force assumption
-  to arbitrary contact location. Answers "what if the load is on the forearm?" before it is asked.
-- **[LocoFormer: Generalist Locomotion via Long-context Adaptation](https://arxiv.org/abs/2509.23745)**
-  · Liu et al., CoRL 2025 (Award Finalist). The other anchor.
+  window, single stage. The strongest current statement of the explicit side of the fork.
+- **[SixthSense](https://arxiv.org/abs/2605.01427)** · Chen et al., arXiv 2026. Whole-body wrench estimation
+  from proprioception and IMU alone, task-agnostic across standing and walking, and not restricted to a
+  single known contact location. The best available evidence that external force is recoverable rather
+  than hidden. Very recent preprint, no venue yet.
+- **[FALCON](https://arxiv.org/abs/2505.06776)** · Zhang et al., L4DC 2026 (Oral). Force-adaptive humanoid
+  loco-manipulation.
 
 ## Repo map
 
 ```
 papers/
-  01-meta-rl/                  adaptation that changes weights
+  01-meta-rl/                  adaptation that changes weights, and where memory-based adaptation began
   02-teacher-student/          privileged teacher, then history-based student
   03-implicit-estimation/      single-stage, latent learned with the policy
   04-in-context/               long history, no test-time gradients
   05-explicit-conditioning/    the quantity is handed to the policy, incl. the force thread
 backlog.md                     everything found but left out, ready to promote
-notes/                         cross-cutting writing, comparisons, chapter drafts
+notes/                         cross-cutting writing, comparisons, drafts
 templates/paper-note.md        the note format
 ```
 
@@ -123,7 +121,7 @@ useful once you are already in it.
 
 Where adaptation-as-a-learning-problem was first posed. Covers both branches: gradient-based, where a test-time update changes the weights, and memory-based, where a recurrent or attentional policy adapts inside its hidden state with no gradient at all. Everything downstream is a specialization of one of these two.
 
-- **[RL²: Fast Reinforcement Learning via Slow Reinforcement Learning](https://arxiv.org/abs/1611.02779)** · Yan Duan, John Schulman, Xi Chen, Peter L. Bartlett, Ilya Sutskever, Pieter Abbeel, arXiv 2016 (arXiv comment: 'Under review as a conference paper at ICLR 2017'; no proceedings publication found) · [notes](papers/01-meta-rl/duan2016rl2.md)
+- **[RL$^2$: Fast Reinforcement Learning via Slow Reinforcement Learning](https://arxiv.org/abs/1611.02779)** · Yan Duan, John Schulman, Xi Chen, Peter L. Bartlett, Ilya Sutskever, Pieter Abbeel, arXiv 2016 (arXiv comment: 'Under review as a conference paper at ICLR 2017'; no proceedings publication found) · [notes](papers/01-meta-rl/duan2016rl2.md)
   - *Unknown:* the identity of the MDP itself (reward and transition structure) drawn from a training distribution.
   - *Obtained:* implicitly, in RNN hidden state accumulated over the full multi-episode trial, with reward fed in as an observation.
   - *Timescale:* fixed per trial and changing only between trials, i.e. the slowest regime in the whole taxonomy
@@ -155,7 +153,7 @@ Train a teacher with privileged access to the unknown, then train a student to r
 
 ### `03-implicit-estimation` Single-stage implicit estimation
 
-Same goal, one stage. The latent is learned jointly with the policy through the critic, a VAE, a contrastive objective, or a self-supervised prediction loss. Nothing is named, so nothing has to be nameable. FAME's actor is HIM-style, so this bucket is the one to be able to defend line by line.
+Same goal, one stage. The latent is learned jointly with the policy through the critic, a VAE, a contrastive objective, or a self-supervised prediction loss. Nothing is named, so nothing has to be nameable. These have become common actor backbones in recent legged and humanoid work, which makes the bucket worth knowing in detail.
 
 - ★ **[DreamWaQ: Learning Robust Quadrupedal Locomotion With Implicit Terrain Imagination via Deep Reinforcement Learning](https://arxiv.org/abs/2301.10602)** · I Made Aswin Nahrendra, Byeongho Yu, Hyun Myung, ICRA 2023 · [notes](papers/03-implicit-estimation/nahrendra2023dreamwaq.md)
   - *Unknown:* terrain geometry and contact properties, plus unmeasurable base linear velocity.
@@ -181,16 +179,20 @@ The RL-squared idea carried onto real robots: no estimation module, no test-time
 
 ### `05-explicit-conditioning` Explicit conditioning on a known or estimated quantity
 
-Hand the policy the varying quantity. There is no inference problem, so there is no history requirement. The open questions are whether you can get the quantity at all, and where in the network it should enter. FAME sits here. Four of the five below are the force thread specifically, which is the immediate research neighborhood.
+Hand the policy the varying quantity. There is no inference problem, so there is no history requirement. The open questions are whether the quantity can be obtained at all, and where in the network it should enter. Most of this bucket is the force thread: work that estimates or controls external contact forces rather than inferring hidden dynamics.
 
 - ★ **[One Policy to Run Them All: an End-to-end Learning Approach to Multi-Embodiment Locomotion](https://arxiv.org/abs/2409.06366)** · Nico Bohlinger, Grzegorz Czechmanowski, Maciej Krupka et al., CoRL 2024 (PMLR v270) · [notes](papers/05-explicit-conditioning/bohlinger2024urma.md)
-  - *Unknown:* the robot's kinematics/actuator parameters, i.e. which body you are in.
+  - *Unknown:* the robot's kinematics/actuator parameters, i.e. which body the policy is running on.
   - *Obtained:* handed in directly, read off the URDF at episode start, never inferred from history.
   - *Timescale:* constant within an episode (embodiment changes only between deployments), so this is zero-timescale adaptation: pure conditioning with no online estimation loop
+- **FAME: Force-Adaptive RL for Expanding the Manipulation Envelope of a Full-Scale Humanoid** · Niraj Pudasaini, Yutong Zhang, Jensen Lavering, Alessandro Roncone, Nikolaus Correll, Under review · [notes](papers/05-explicit-conditioning/pudasaini2026fame.md)
+  - *Unknown:* the external force applied at the hands.
+  - *Obtained:* explicitly, from an analytic inverse-dynamics estimate over measured joint torques plus the measured arm configuration, with no privileged teacher and no long history.
+  - *Timescale:* fast, the load can change within a few control steps
 - ★ **[Learning Force Control for Legged Manipulation](https://arxiv.org/abs/2405.01402)** · Tifanny Portela, Gabriel B. Margolis, Yandong Ji, Pulkit Agrawal, ICRA 2024 · [notes](papers/05-explicit-conditioning/portela2024forcecontrol.md)
   - *Unknown:* the contact force at the end effector and the compliance of whatever is being pushed.
   - *Obtained:* two ways at once, a force *command* fed explicitly as conditioning and a force *estimate* regressed from 30 steps of proprioception, so the same paper sits on both sides of the explicit/implicit line.
-  - *Timescale:* fast, contact-event rate (tens of ms), which is the regime FAME cares about
+  - *Timescale:* fast, contact-event rate (tens of ms), which is the regime contact-rich loco-manipulation lives in
 - ★ **[FALCON: Learning Force-Adaptive Humanoid Loco-Manipulation](https://arxiv.org/abs/2505.06776)** · Yuanhang Zhang, Yifu Yuan, Prajwal Gurunath, et al. (Tairan He, Guanya Shi), L4DC 2026 (Oral) · [notes](papers/05-explicit-conditioning/zhang2025falcon.md)
   - *Unknown:* magnitude/direction of the external end-effector wrench (0-20N payload transport, 0-40N door opening, 0-100N cart pulling in the real-world tasks).
   - *Obtained:* never estimated at deployment; inferred implicitly from a short (5-step) proprioceptive history, with the true force used only as a privileged critic input at train time.
@@ -204,32 +206,31 @@ Hand the policy the varying quantity. There is no inference problem, so there is
   - *Obtained:* explicit supervised regression from a 32-step proprioceptive window, single-stage joint training, no distillation and no wrist sensor.
   - *Timescale:* 32 steps of history, roughly 0.6 s at a typical 50 Hz control rate (the paper does not state the rate explicitly), deliberately longer than the HIM/DreamWaQ 5-step window because contact wrench must be disentangled from the arm's own inertial torques
 
-## Open threads
+## Open questions
 
-Things I want to be able to answer by the end of this, roughly in order of how much they
-would change the thesis.
+The questions this reading is meant to answer, roughly in order of how unsettled they are.
 
-- **The missing baseline.** "Why not just give the policy a long history and let it infer the
-  load implicitly, LocoFormer-style?" There is currently no long-context implicit baseline on a
-  fixed-stance force task. Running one would either validate explicit estimation or kill it.
-- **Residual inference.** The RNEA estimate recovers instantaneous force but inherits every
-  error in the arm dynamics model. A long-context module that corrects the residual on hardware
-  is the clean way to combine the two lines.
-- **Pre-contact anticipation.** The force estimate is by construction reactive. It says nothing
-  about an object's mass before it is picked up. Cross-trial adaptation over repeated picks is
-  where in-context methods have something explicit estimation cannot get.
-- **Load-carrying locomotion.** Where the implicit line and the explicit force line meet most
-  directly, and where "stepping is a failure" stops being true.
-- **When is estimation better than inference?** The general version of the question. Probably
-  a function of measurement SNR, model error, and how fast the quantity changes relative to the
-  information rate of the history.
+- **The missing head-to-head.** Nobody has run a long-context implicit policy against an explicit
+  estimator on a task where the unknown genuinely *is* measurable. Until someone does, the choice
+  between them is argued from priors rather than evidence.
+- **Residual inference.** Analytic wrench estimators inherit every error in the dynamics model they
+  are built on. A long-context module that learns the residual on hardware is the obvious way to
+  combine the model-based and in-context lines, and it is largely unexplored.
+- **Pre-contact anticipation.** Force estimation is reactive by construction. It says nothing about
+  an object's mass before it is picked up. Cross-trial adaptation over repeated interactions is where
+  in-context methods have something estimation cannot get.
+- **Load-carrying locomotion.** Where the implicit line and the explicit force line meet most directly,
+  and where stepping stops being something a controller can be forbidden from doing.
+- **When is estimation better than inference?** The general version of the question. Probably a function
+  of measurement SNR, model error, and how fast the quantity changes relative to the information rate
+  of the history. No one has written this down properly.
 
 ## Conventions
 
-- One file per paper, in the bucket folder that matches how it obtains context. If a paper
-  spans buckets, file it under its *mechanism*, not its application domain, and cross-link.
+- One file per paper, in the bucket folder that matches how it obtains context. If a paper spans
+  buckets, file it under its *mechanism*, not its application domain, and cross-link.
 - Filenames are citekeys: `kumar2021rma.md`, `long2024him.md`.
 - Start from `templates/paper-note.md`. Fill the three-axis table before writing prose. If the
   axes are hard to fill in, that difficulty is the interesting part of the paper.
-- `notes/` is for cross-cutting writing: taxonomy arguments, comparisons, thesis-chapter drafts.
-  Anything that is about more than one paper goes there.
+- `notes/` is for cross-cutting writing: taxonomy arguments, comparisons, longer drafts. Anything
+  that is about more than one paper goes there.
