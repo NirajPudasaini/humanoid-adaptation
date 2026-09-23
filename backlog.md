@@ -12,7 +12,7 @@ using `templates/paper-note.md`.
   - *Obtained:* supervised regression on a short sliding window of recent proprioceptive transitions, with the meta-objective making one SGD step sufficient.
   - *Timescale:* the fastest gradient-based option in the literature, adapting within tens of timesteps and re-adapting continuously, versus minutes-to-hours for policy fine-tuning
   - *Why it might matter:* This is the strongest existing argument that gradient-based adaptation can be fast enough to matter online, and therefore the paper to answer before claiming that an explicitly estimated force is necessary. The pulled-payload experiment is almost exactly a carried-load disturbance, but handled by silently refitting a dynamics model rather than by naming the force. It gives a clean framing sentence: gradient adaptation identifies dynamics implicitly and needs a window of transitions to do it, whereas RNEA plus the arm Jacobian gives the force in closed form at one timestep, which is what a load that changes in 100 ms demands.
-- **[Efficient Off-Policy Meta-Reinforcement Learning via Probabilistic Context Variables](https://arxiv.org/abs/1903.08254)** · Kate Rakelly, Aurick Zhou, Deirdre Quillen, Chelsea Finn, Sergey Levine, ICML 2019 (PMLR v97, pp. 5331-5340)
+- **[Efficient Off-Policy Meta-Reinforcement Learning via Probabilistic Context Variables](https://arxiv.org/abs/1903.08254)** · Kate Rakelly, Aurick Zhou, Deirdre Quillen, Chelsea Finn, Sergey Levine, ICML 2019
   - *Unknown:* a task identity, entangling reward and dynamics, compressed into a low-dimensional z.
   - *Obtained:* amortized probabilistic inference from a buffer of recent transitions, decoupled from the control policy's own training.
   - *Timescale:* a few exploratory episodes to concentrate the posterior, and because the encoder is a set function it discards ordering and cannot track a task that changes mid-episode
@@ -27,17 +27,17 @@ using `templates/paper-note.md`.
   - *Obtained:* reward-driven gradient updates to the policy weights from on-robot rollouts, so the context is absorbed into the parameters rather than inferred.
   - *Timescale:* hours, and once adapted the policy is specialized to that terrain, so it assumes the disturbance is stationary
   - *Why it might matter:* This is the honest upper bound on what weight-changing adaptation costs on real legged hardware, and it is the number to cite when bounding the whole bucket out of the fast-disturbance regime. A hand load that changes in under a second cannot be tracked by a process that needs two hours and a fall recovery controller, which leaves explicit estimation and in-context memory as the only two viable families. It also supplies the vocabulary (autonomous resets, sample-efficient off-policy fine-tuning) for future work on adapting a humanoid policy between sessions rather than within an episode.
-- **[A Walk in the Park: Learning to Walk in 20 Minutes With Model-Free Reinforcement Learning](https://arxiv.org/abs/2208.07860)** · Laura Smith, Ilya Kostrikov, Sergey Levine, RSS 2023 (demo track, published as "Demonstrating A Walk in the Park..."); arXiv 2022
+- **[A Walk in the Park: Learning to Walk in 20 Minutes With Model-Free Reinforcement Learning](https://arxiv.org/abs/2208.07860)** · Laura Smith, Ilya Kostrikov, Sergey Levine, RSS 2023 (demo track)
   - *Unknown:* everything, since there is no prior and no context variable at all, only the true dynamics reached through data.
   - *Obtained:* reward-driven gradient descent on hardware.
   - *Timescale:* 20 minutes to competence, which sets the empirical floor for how fast pure weight updates can absorb a new situation
   - *Why it might matter:* This is the number that makes the timescale axis of any adaptation taxonomy quantitative: the fastest known model-free on-hardware learning is about 20 minutes, while a carried load can change in a fraction of a second, so the two live three or four orders of magnitude apart. It also supplies the honest caveat that this speed comes from a quadruped that may fall freely, which a humanoid holding a load with both hands and constrained not to step cannot do. Useful in the related-work paragraph that closes off the on-robot-RL option for contact-constrained tasks.
-- **[Learning and Adapting Agile Locomotion Skills by Transferring Experience](https://arxiv.org/abs/2304.09834)** · Laura Smith, J. Chase Kew, Tianyu Li, Linda Luu, Xue Bin Peng, Sehoon Ha, Jie Tan, Sergey Levine, RSS 2023 (DOI 10.15607/RSS.2023.XIX.051)
+- **[Learning and Adapting Agile Locomotion Skills by Transferring Experience](https://arxiv.org/abs/2304.09834)** · Laura Smith, J. Chase Kew, Tianyu Li, Linda Luu, Xue Bin Peng, Sehoon Ha, Jie Tan, Sergey Levine, RSS 2023
   - *Unknown:* how to solve a harder task, or the same task under changed dynamics or objective, given a controller that is suboptimal for it.
   - *Obtained:* offline data from the old controller mixed into a new optimization, which is adaptation at training time rather than deployment time.
   - *Timescale:* a full retraining run, mostly in simulation with direct hardware transfer, so it does not adapt at all once deployed
   - *Why it might matter:* The practical answer to a question anyone with existing whole-body baselines will hit: trained locomotion or loco-manipulation controllers already on hand, including decoupled upper/lower-body ones, can have their rollouts reused to bootstrap a force-conditioned policy instead of starting from scratch. It also marks the boundary of this bucket, since the weights change but never during deployment, which makes it a useful contrast case for the argument that 'adaptation' in the literature covers at least three different clocks. The project page names the method TWiRL, which justifies the citekey.
-- **[Robot Trains Robot: Automatic Real-World Policy Adaptation and Learning for Humanoids](https://arxiv.org/abs/2508.12252)** · Kaizhe Hu, Haochen Shi, Yao He, Weizhuo Wang, C. Karen Liu, Shuran Song, CoRL 2025 (PMLR v305)
+- **[Robot Trains Robot: Automatic Real-World Policy Adaptation and Learning for Humanoids](https://arxiv.org/abs/2508.12252)** · Kaizhe Hu, Haochen Shi, Yao He, Weizhuo Wang, C. Karen Liu, Shuran Song, CoRL 2025
   - *Unknown:* the residual sim-to-real dynamics gap of a specific humanoid, captured in a latent that was trained in simulation over randomized dynamics.
   - *Obtained:* real-world reward-driven search in that latent space, so weights are frozen and only a handful of dimensions move.
   - *Timescale:* tens of minutes per robot, and the result is persistent calibration, not within-episode tracking
@@ -45,12 +45,12 @@ using `templates/paper-note.md`.
 
 ## `02-teacher-student`
 
-- **[Learning by Cheating](https://arxiv.org/abs/1912.12294)** · Dian Chen, Brady Zhou, Vladlen Koltun, Philipp Krähenbühl, CoRL 2019, PMLR 100
+- **[Learning by Cheating](https://arxiv.org/abs/1912.12294)** · Dian Chen, Brady Zhou, Vladlen Koltun, Philipp Krähenbühl, CoRL 2019
   - *Unknown:* the full scene state that pixels only partially reveal.
   - *Obtained:* offline imitation of a privileged teacher, with the teacher queryable off-distribution.
   - *Timescale:* not an online adaptation method at all; the unknown is static per frame and there is no notion of context accumulating over time
   - *Why it might matter:* The correct ancestor to cite in the bucket's origin sentence, and worth reading precisely because it isolates what privileged learning provides (a dense, always-available supervision signal) from what RMA added on top (a history encoder that makes the student's input a time series). That separation is the cleanest way to explain why LocoFormer's in-context memory is a different mechanism rather than a longer version of the same one, and it guards against over-crediting privileged training for the adaptation behavior. Skim-depth reading; one section is enough.
-- **[Learning robust perceptive locomotion for quadrupedal robots in the wild](https://arxiv.org/abs/2201.08117)** · Takahiro Miki, Joonho Lee, Jemin Hwangbo, Lorenz Wellhausen, Vladlen Koltun, Marco Hutter, Science Robotics 7(62), eabk2822
+- **[Learning robust perceptive locomotion for quadrupedal robots in the wild](https://arxiv.org/abs/2201.08117)** · Takahiro Miki, Joonho Lee, Jemin Hwangbo, Lorenz Wellhausen, Vladlen Koltun, Marco Hutter, Science Robotics 7(62), 2022
   - *Unknown:* true terrain geometry plus, critically, the reliability of the sensed estimate of it.
   - *Obtained:* teacher-student distillation into a recurrent belief state that fuses a noisy measured channel with history, with an auxiliary decoder reconstructing the clean signal.
   - *Timescale:* per-step gating, though the recurrent structure lets a corrected belief persist after the misleading measurement is gone
@@ -58,17 +58,17 @@ using `templates/paper-note.md`.
 
 ## `03-implicit-estimation`
 
-- **[Concurrent Training of a Control Policy and a State Estimator for Dynamic and Robust Legged Locomotion](https://arxiv.org/abs/2202.05481)** · Gwanghyeon Ji, Juhyeok Mun, Hyeongjun Kim, Jemin Hwangbo, IEEE RA-L 7(2), April 2022 (also presented at ICRA 2022)
+- **[Concurrent Training of a Control Policy and a State Estimator for Dynamic and Robust Legged Locomotion](https://arxiv.org/abs/2202.05481)** · Gwanghyeon Ji, Juhyeok Mun, Hyeongjun Kim, Jemin Hwangbo, IEEE RA-L 7(2), 2022
   - *Unknown:* named, physically meaningful robot states that are unmeasurable on hardware (base linear velocity, foot height, contact probability) rather than environment parameters.
   - *Obtained:* fully explicit supervised regression, concurrent with policy optimization, no latent and no distillation.
   - *Timescale:* per-control-step; the estimate is a filtered instantaneous quantity, not an episode-level property
   - *Why it might matter:* This is the ancestor of the whole bucket and the purest 'explicit estimate, single stage' point on the taxonomy. Its key argument is the defensive one every explicit-estimation design has to make: training the policy concurrently with an imperfect estimator makes the policy robust to that estimator's bias, which is the direct answer to the question of why a policy should be conditioned on an analytically or statistically derived estimate with known error rather than on ground-truth state. Cite it as the precedent that estimator noise is a feature of joint training, and as the contrast case that has no implicit latent at all, bracketing LocoFormer at the opposite end.
-- **[Advancing Humanoid Locomotion: Mastering Challenging Terrains with Denoising World Model Learning](https://arxiv.org/abs/2408.14472)** · Xinyang Gu, Yen-Jen Wang, Xiang Zhu, Chengming Shi, Yanjiang Guo, Yichen Liu, Jianyu Chen, RSS 2024 (Best Paper Award Finalist)
+- **[Advancing Humanoid Locomotion: Mastering Challenging Terrains with Denoising World Model Learning](https://arxiv.org/abs/2408.14472)** · Xinyang Gu, Yen-Jen Wang, Xiang Zhu, Chengming Shi, Yanjiang Guo, Yichen Liu, Jianyu Chen, RSS 2024 (Best Paper Finalist)
   - *Unknown:* the true underlying state behind four distinct corruption sources, including quantities that are structurally missing rather than merely noisy.
   - *Obtained:* implicit latent, but supervised against privileged simulator state inside the single RL loop (privileged information is used as a regression target, never as a separate teacher policy).
   - *Timescale:* per-step denoising of the current state; adaptation is instantaneous filtering, not slow system identification
   - *Why it might matter:* The humanoid-scale existence proof for this bucket on a 1.65 m, 57 kg robot (XBot-L; a smaller 1.2 m, 38 kg XBot-S is also used), which is the platform class of current full-size humanoids, and the strongest sim-to-real evidence that single-stage latent estimation survives humanoid actuator and contact noise. Its four-way noise taxonomy is useful vocabulary for the field: an unmeasured contact wrench is a 'masking noise' quantity in DWL's sense, structurally unmeasurable and therefore reconstructed, whether the reconstruction is learned as it is here or computed analytically from rigid-body dynamics. One correction to carry into any reading list: this is RSS 2024 (Best Paper Award Finalist), not Science Robotics, so the citation must not be written from memory.
-- **[SLR: Learning Quadruped Locomotion without Privileged Information](https://arxiv.org/abs/2406.04835)** · Shiyi Chen, Zeyu Wan, Shiyang Yan, Chun Zhang, Weiyi Zhang, Qiang Li, Debing Zhang, Fasih Ud Din Farrukh, CoRL 2024 (Proceedings of the 8th Conference on Robot Learning, PMLR v270)
+- **[SLR: Learning Quadruped Locomotion without Privileged Information](https://arxiv.org/abs/2406.04835)** · Shiyi Chen, Zeyu Wan, Shiyang Yan, Chun Zhang, Weiyi Zhang, Qiang Li, Debing Zhang, Fasih Ud Din Farrukh, CoRL 2024
   - *Unknown:* nothing is named at all, the environment representation is entirely self-discovered from the MDP's own transition structure.
   - *Obtained:* fully implicit and fully self-supervised (latent-space forward model + triplet contrast), plus critic backpropagation, in a single PPO stage.
   - *Timescale:* 10 proprioceptive steps in, one step ahead predicted, so again sub-0.2 s
@@ -76,15 +76,15 @@ using `templates/paper-note.md`.
 
 ## `04-in-context`
 
-- **[Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context](https://arxiv.org/abs/1901.02860)** · Zihang Dai, Zhilin Yang, Yiming Yang, Jaime Carbonell, Quoc V. Le, Ruslan Salakhutdinov, ACL 2019 (long paper)
+- **[Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context](https://arxiv.org/abs/1901.02860)** · Zihang Dai, Zhilin Yang, Yiming Yang, Jaime Carbonell, Quoc V. Le, Ruslan Salakhutdinov, ACL 2019
   - Not an adaptation paper: it is the architectural primitive that sets how far back context can reach. Relevant axis contribution: it determines the maximum timescale of change an implicit method can track, and its cost scales with that horizon.
   - *Why it might matter:* Read this only for the mechanism section, because it is exactly why LocoFormer's 6 layers x 128-step segments yield ~896 steps / ~18 s of memory rather than 128 (that paper itself states the 896-timestep O(NL) figure). The depth-times-segment arithmetic is what lets anyone state quantitatively what history budget an implicit method needs, and set it against a short 3-step proprioceptive encoder plus an analytic inverse-dynamics (RNEA) call that recovers the same class of information in one timestep. It supplies the compute and latency side of that comparison at humanoid control rates.
-- **[In-context Reinforcement Learning with Algorithm Distillation](https://arxiv.org/abs/2210.14215)** · Michael Laskin, Luyu Wang, Junhyuk Oh, Emilio Parisotto, Stephen Spencer, et al. (DeepMind), ICLR 2023 (oral; arXiv 2210.14215, Oct 2022)
+- **[In-context Reinforcement Learning with Algorithm Distillation](https://arxiv.org/abs/2210.14215)** · Michael Laskin, Luyu Wang, Junhyuk Oh, Emilio Parisotto, Stephen Spencer, et al. (DeepMind), ICLR 2023 (oral)
   - *Unknown:* the task's optimal policy.
   - *Obtained:* implicitly, from a long context containing an entire learning trajectory including its mistakes, so the evidence is reward-labelled behaviour rather than sensor readings.
   - *Timescale:* across episodes, deliberately spanning the full learning curve
   - *Why it might matter:* This is the mechanistic explanation for LocoFormer's most striking result, the emergent few-shot cross-trial improvement where early falls make later rollouts better. It establishes that the behaviour is a known, named phenomenon with a training-data prerequisite, not magic, and that the prerequisite is a context containing suboptimal-then-better behaviour. That yields a sharp negative result for any task whose structure forbids it: where stepping away is disallowed and a hand-load spike gives one attempt, there is no across-trial improvement channel, so the information must come from the current torque reading.
-- **[Humanoid Locomotion as Next Token Prediction](https://arxiv.org/abs/2402.19469)** · Ilija Radosavovic, Bike Zhang, Baifeng Shi, Jathushan Rajasegaran, Sarthak Kamat, Trevor Darrell, Koushil Sreenath, Jitendra Malik, NeurIPS 2024 (arXiv 2402.19469)
+- **[Humanoid Locomotion as Next Token Prediction](https://arxiv.org/abs/2402.19469)** · Ilija Radosavovic, Bike Zhang, Baifeng Shi, Jathushan Rajasegaran, Sarthak Kamat, Trevor Darrell, Koushil Sreenath, Jitendra Malik, NeurIPS 2024
   - *Unknown:* the dynamics and the correct action, with no separated latent for either.
   - *Obtained:* implicitly, through next-token prediction over a sensorimotor history, and notably through supervised sequence modelling rather than RL.
   - *Timescale:* within-episode context, adaptation to command and terrain changes over seconds
