@@ -74,11 +74,7 @@ Hand the policy the varying quantity. There is no inference problem, so there is
 - **[SixthSense: Task-Agnostic Proprioception-Only Whole-Body Wrench Estimation for Humanoids](https://arxiv.org/abs/2605.01427)** · Xingzhou Chen, Xiayan Xu, Yan Ning, et al. (Haodong Zhang, Ling Shi), arXiv 2026 · [notes](papers/05-explicit-conditioning/chen2026sixthsense.md)
   Infers whole-body contact timing, location and wrench from proprioception and IMU alone, with a conditional flow matching model that treats contact as sparse in space and time. Not restricted to a single known contact point.
 
-## Also here
+## Adding a paper
 
-- [`backlog.md`](backlog.md): papers found while building this list but left out to keep it
-  startable. Same verified citations, ready to promote into a section.
-- [`notes/`](notes/): cross-cutting writing: taxonomy arguments, comparisons, longer drafts.
-  Anything about more than one paper goes here.
-- [`templates/paper-note.md`](templates/paper-note.md): the file format. Title, citation,
-  short description. Add structure below it as you read.
+Copy `templates/paper-note.md` into the section folder that matches how the method obtains
+its context, name it after the citekey (`kumar2021rma.md`), and add a line for it above.
