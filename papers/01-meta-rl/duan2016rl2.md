@@ -1,11 +1,13 @@
-# RL$^2$: Fast Reinforcement Learning via Slow Reinforcement Learning
+# RL²: Fast Reinforcement Learning via Slow Reinforcement Learning
 
 **Citekey:** `duan2016rl2`
 **Authors:** Yan Duan, John Schulman, Xi Chen, Peter L. Bartlett, Ilya Sutskever, Pieter Abbeel
 **Venue:** arXiv 2016 (arXiv comment: 'Under review as a conference paper at ICLR 2017'; no proceedings publication found)
 **Links:** [arXiv](https://arxiv.org/abs/1611.02779)
 **Read on:** _not yet_
-**Bucket:** `04-in-context`
+**Bucket:** `01-meta-rl`
+
+**Also relevant to:** `04-in-context`
 
 ## The three axes
 

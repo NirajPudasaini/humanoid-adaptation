@@ -5,7 +5,9 @@
 **Venue:** ICML 2023 (PMLR 202:1887-1935, oral; arXiv 2301.07608)
 **Links:** [arXiv](https://arxiv.org/abs/2301.07608)
 **Read on:** _not yet_
-**Bucket:** `04-in-context`
+**Bucket:** `01-meta-rl`
+
+**Also relevant to:** `04-in-context`
 
 ## The three axes
 
