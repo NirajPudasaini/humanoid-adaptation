@@ -1,5 +1,5 @@
 # FAME: Force-Adaptive RL for Expanding the Manipulation Envelope of a Full-Scale Humanoid
 
-Niraj Pudasaini, Yutong Zhang, Jensen Lavering, Alessandro Roncone, Nikolaus Correll · Under review
+Niraj Pudasaini, Yutong Zhang, Jensen Lavering, Alessandro Roncone, Nikolaus Correll · arXiv 2026 · [paper](https://arxiv.org/abs/2603.08961)
 
-Conditions a full-scale humanoid on an external hand force estimated from joint torques by inverse dynamics, together with the measured arm configuration. Targets holding a fixed stance under hand loads rather than stepping away from them.
+Conditions a full-scale humanoid standing policy on a latent encoding upper-body joint configuration and bimanual interaction forces, with the forces estimated from robot dynamics at deployment rather than measured. Targets holding a stance under hand loads without wrist force/torque sensors.

@@ -185,9 +185,9 @@ Hand the policy the varying quantity. There is no inference problem, so there is
   - *Unknown:* the robot's kinematics/actuator parameters, i.e. which body the policy is running on.
   - *Obtained:* handed in directly, read off the URDF at episode start, never inferred from history.
   - *Timescale:* constant within an episode (embodiment changes only between deployments), so this is zero-timescale adaptation: pure conditioning with no online estimation loop
-- **FAME: Force-Adaptive RL for Expanding the Manipulation Envelope of a Full-Scale Humanoid** · Niraj Pudasaini, Yutong Zhang, Jensen Lavering, Alessandro Roncone, Nikolaus Correll, Under review · [notes](papers/05-explicit-conditioning/pudasaini2026fame.md)
-  - *Unknown:* the external force applied at the hands.
-  - *Obtained:* explicitly, from an analytic inverse-dynamics estimate over measured joint torques plus the measured arm configuration, with no privileged teacher and no long history.
+- **[FAME: Force-Adaptive RL for Expanding the Manipulation Envelope of a Full-Scale Humanoid](https://arxiv.org/abs/2603.08961)** · Niraj Pudasaini, Yutong Zhang, Jensen Lavering, Alessandro Roncone, Nikolaus Correll, arXiv 2026 · [notes](papers/05-explicit-conditioning/pudasaini2026fame.md)
+  - *Unknown:* the bimanual interaction forces acting through the arms.
+  - *Obtained:* explicitly, estimated from the robot dynamics at deployment and encoded together with upper-body joint configuration into a learned latent, with no wrist force/torque sensor and no privileged teacher.
   - *Timescale:* fast, the load can change within a few control steps
 - ★ **[Learning Force Control for Legged Manipulation](https://arxiv.org/abs/2405.01402)** · Tifanny Portela, Gabriel B. Margolis, Yandong Ji, Pulkit Agrawal, ICRA 2024 · [notes](papers/05-explicit-conditioning/portela2024forcecontrol.md)
   - *Unknown:* the contact force at the end effector and the compliance of whatever is being pushed.
